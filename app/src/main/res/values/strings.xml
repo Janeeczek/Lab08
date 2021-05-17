@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Lab08</string>
+    <string name="przyciskSkladuj_text">Składuj</string>
+    <string name="przyciskWydaj_text">Wydaj</string>
+    <string name="edycjaIlosc_text">edycjailosc</string>
+    <string name="tekstJednostka_text">jednostkaa</string>
+</resources>
