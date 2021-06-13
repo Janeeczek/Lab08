@@ -1,5 +1,6 @@
 package pollub.ism.lab08;
 
+import android.icu.text.IDNA;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -22,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
 
     private String wybraneWarzywoNazwa = null;
     private Integer wybraneWarzywoIlosc = null;
+    private Integer wybraneWarzywoId = null;
     private String wybraneWarzywoCzas = null;
 
     public enum OperacjaMagazynowa {SKLADUJ, WYDAJ};
@@ -47,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
             String[] asortyment = getResources().getStringArray(R.array.Asortyment);
             for(String nazwa : asortyment){
                 PozycjaMagazynowa pozycjaMagazynowa = new PozycjaMagazynowa();
-                pozycjaMagazynowa.NAME = nazwa; pozycjaMagazynowa.QUANTITY = 0;pozycjaMagazynowa.LASTCHANGETIME = "";pozycjaMagazynowa.HISTORY = "";
+                pozycjaMagazynowa.NAME = nazwa; pozycjaMagazynowa.QUANTITY = 0;pozycjaMagazynowa.LASTCHANGETIME = "nigdy";
                 bazaDanych.pozycjaMagazynowaDAO().insert(pozycjaMagazynowa);
             }
         }
@@ -72,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 wybraneWarzywoNazwa = adapter.getItem(i).toString(); // <---
-
+                wybraneWarzywoId = i; //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                 aktualizuj();
             }
 
@@ -84,25 +86,24 @@ public class MainActivity extends AppCompatActivity {
 
     }
     private void aktualizuj(){
-        String history = bazaDanych.pozycjaMagazynowaDAO().getHistoryByName(wybraneWarzywoNazwa);
-        List<String> formattedHistory = StringListConverter.fromString(history);
+       // String history = bazaDanych.pozycjaMagazynowaDAO().getHistoryByName(wybraneWarzywoNazwa);
+        List<InfoPozycjaMagazynowa> history = bazaDanych.pozycjaMagazynowaDAO().getLogs(wybraneWarzywoId);
         wybraneWarzywoIlosc = bazaDanych.pozycjaMagazynowaDAO().findQuantityByName(wybraneWarzywoNazwa);
         wybraneWarzywoCzas = bazaDanych.pozycjaMagazynowaDAO().getLastChangeTimeByName(wybraneWarzywoNazwa);
         binding.tekstStanMagazynu.setText("Stan magazynu dla " + wybraneWarzywoNazwa + " wynosi: " + wybraneWarzywoIlosc);
 
         binding.tekstJednostka.setText(wybraneWarzywoCzas);
         binding.logText.getEditableText().clear();
-        for(String s : formattedHistory) {
-            if(!s.isEmpty())
-            binding.logText.append(s + "\n");
-        }
+        for(InfoPozycjaMagazynowa s : history) {
+
+            binding.logText.append(s.LOG + "\n");
+       }
 
     }
     private void zmienStan(OperacjaMagazynowa operacja){
         String newHistory = "";
+
         Integer zmianaIlosci = null, nowaIlosc = null;
-        String history = bazaDanych.pozycjaMagazynowaDAO().getHistoryByName(wybraneWarzywoNazwa);
-        List<String> formattedHistory = StringListConverter.fromString(history);
         try {
             zmianaIlosci = Integer.parseInt(binding.edycjaIlosc.getText().toString());
         }catch(NumberFormatException ex){
@@ -119,17 +120,16 @@ public class MainActivity extends AppCompatActivity {
 
                 break;
             case WYDAJ:
+                //DODAJ LOGIKE SYTUACJI KIEDY WYDAJESZ WIECEJ NIZ JEST NA STANIE
                 nowaIlosc = wybraneWarzywoIlosc - zmianaIlosci;
                 newHistory = czas + " " + wybraneWarzywoIlosc + " -> " + nowaIlosc;
 
                 break;
         }
-
-        formattedHistory.add(newHistory);
+        InfoPozycjaMagazynowa newLog = new InfoPozycjaMagazynowa(newHistory,wybraneWarzywoId);
+        bazaDanych.pozycjaMagazynowaDAO().insert(newLog);
         bazaDanych.pozycjaMagazynowaDAO().updateQuantityByName(wybraneWarzywoNazwa,nowaIlosc);
         bazaDanych.pozycjaMagazynowaDAO().updateLastChangeTimeByName(wybraneWarzywoNazwa, czas);
-        String t = StringListConverter.toString(formattedHistory);
-        bazaDanych.pozycjaMagazynowaDAO().updateHistoryByName(wybraneWarzywoNazwa,t);
         aktualizuj();
 
 

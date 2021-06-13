@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
-@Entity(tableName = "Warzywniak")
+@Entity(tableName = "PozycjaMagazynowa")
 public class PozycjaMagazynowa {
     @PrimaryKey(autoGenerate = true)
     public int _id;
@@ -18,5 +18,5 @@ public class PozycjaMagazynowa {
     public int QUANTITY;
     public String LASTCHANGETIME;
 
-    public String HISTORY;
+
 }

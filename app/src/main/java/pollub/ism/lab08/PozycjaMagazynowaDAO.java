@@ -14,24 +14,33 @@ public interface PozycjaMagazynowaDAO {
 
     @Insert  //Automatyczna kwerenda wystarczy
     public void insert(PozycjaMagazynowa pozycja);
-
+    @Insert  //Automatyczna kwerenda wystarczy
+    public void insert(InfoPozycjaMagazynowa pozycjaInfo);
     @Update //Automatyczna kwerenda wystarczy
-    void update(PozycjaMagazynowa pozycja);
+    public void update(PozycjaMagazynowa pozycja);
 
-    @Query("SELECT QUANTITY FROM Warzywniak WHERE NAME= :wybraneWarzywoNazwa") //Nasza kwerenda
+    @Query("SELECT QUANTITY FROM PozycjaMagazynowa WHERE NAME= :wybraneWarzywoNazwa") //Nasza kwerenda
     int findQuantityByName(String wybraneWarzywoNazwa);
-    @Query("SELECT LASTCHANGETIME FROM Warzywniak WHERE NAME= :wybraneWarzywoNazwa") //Nasza kwerenda
+    @Query("SELECT LASTCHANGETIME FROM PozycjaMagazynowa WHERE NAME= :wybraneWarzywoNazwa") //Nasza kwerenda
     String getLastChangeTimeByName(String wybraneWarzywoNazwa);
-    @Query("UPDATE Warzywniak SET QUANTITY = :wybraneWarzywoNowaIlosc WHERE NAME= :wybraneWarzywoNazwa")
+    @Query("UPDATE PozycjaMagazynowa SET QUANTITY = :wybraneWarzywoNowaIlosc WHERE NAME= :wybraneWarzywoNazwa")
     void updateQuantityByName(String wybraneWarzywoNazwa, int wybraneWarzywoNowaIlosc);
-    @Query("UPDATE Warzywniak SET LASTCHANGETIME = :time WHERE NAME= :wybraneWarzywoNazwa")
+    @Query("UPDATE PozycjaMagazynowa SET LASTCHANGETIME = :time WHERE NAME= :wybraneWarzywoNazwa")
     void updateLastChangeTimeByName(String wybraneWarzywoNazwa, String time);
-    @Query("UPDATE Warzywniak SET HISTORY = :newHistory WHERE NAME= :wybraneWarzywoNazwa")
-    void updateHistoryByName(String wybraneWarzywoNazwa, String newHistory);
+    //@Query("UPDATE Warzywniak SET HISTORY = :newHistory WHERE NAME= :wybraneWarzywoNazwa")
+    //void updateHistoryByName(String wybraneWarzywoNazwa, String newHistory);
 
-    @Query("SELECT HISTORY FROM Warzywniak WHERE NAME= :wybraneWarzywoNazwa")
-    String getHistoryByName(String wybraneWarzywoNazwa);
+   // @Query("SELECT HISTORY FROM InfoPozycjaMagazynowa WHERE NAME= :wybraneWarzywoNazwa")
+   // String getHistoryByName(String wybraneWarzywoNazwa);
 
-    @Query("SELECT COUNT(*) FROM Warzywniak") //Ile jest rekordów w tabeli
+    @Query("SELECT COUNT(*) FROM PozycjaMagazynowa") //Ile jest rekordów w tabeli
     int size();
+    /*
+    @Query("SELECT * FROM PozycjaMagazynowa")
+    List<PozycjaMagazynowaWithInfo> loadTestModelsWithBooks();
+    */
+
+    @Query("SELECT * FROM InfoPozycjaMagazynowa WHERE POZYCJAMAGAZYNOWA_ID=:warzywoId")
+    List<InfoPozycjaMagazynowa> getLogs(int warzywoId);
+
 }
